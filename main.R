@@ -27,9 +27,10 @@ subtlex_us_pp <- "phoneme_words_logpp.txt" %>%
   .[!duplicated(.$Input), ]
 
 # assign subtlex_us pp df_on (v2)
-assign_subtlex_us_pp <- function(df) {
+assign_subtlex_us_pp <- function(df, var = phon) {
+  var <- enquo(var)
   df %>%
-    mutate(ph_pr = sapply(phon, function(x) {
+    mutate(ph_pr = sapply(!!var, function(x) {
       x %>%
         str_replace_all("_", ".") %>%
         str_replace_all("UU", "AH") %>%
@@ -46,33 +47,37 @@ mod_on_subtlex_us <- assign_subtlex_us_pp(mod_on)
 mot_uni_on_subtlex_us <- assign_subtlex_us_pp(mot_uni_on)
 
 # recalculate parcentages in quartiles
-ph_pr_qu_subtlex_us <- subtlex_us_pp %>%
-  filter(Input %in% (mot_uni_on_subtlex_us$phon %>% 
-                       unlist() %>%
-                       str_replace_all("_", ".") %>%
-                       str_replace_all("UU", "AH") %>%
-                       c(chi_uni_on_subtlex_us$phon %>% 
-                           unlist() %>%
-                           str_replace_all("_", ".") %>%
-                           str_replace_all("UU", "AH"))
-                     )) %>%
-  .$unsLBPAV %>%
-  quantile(na.rm = TRUE) %>%
-  .[c(2,3,4)]
+pp_qu_subtlex_us <- function(df1_var, df2_var) {
+  subtlex_us_pp %>%
+    filter(Input %in% (df1_var %>% 
+                         unlist() %>%
+                         str_replace_all("_", ".") %>%
+                         str_replace_all("UU", "AH") %>%
+                         c(df2_var %>% 
+                             unlist() %>%
+                             str_replace_all("_", ".") %>%
+                             str_replace_all("UU", "AH"))
+    )) %>%
+    .$unsLBPAV %>%
+    quantile(na.rm = TRUE) %>%
+    .[c(2,3,4)]
+}
 
-quartiles_sets <- function(df) {
+ph_pr_qu_subtlex_us <- pp_qu_subtlex_us(mot_uni_on_subtlex_us$phon, chi_uni_on_subtlex_us$phon)
+
+quartiles_sets <- function(df, pp_qu = ph_pr_qu_subtlex_us) {
   df %<>%
     mutate(ph_pr_qu1 = sapply(ph_pr, function(x) {
-      length(x[which(x < ph_pr_qu_subtlex_us[1])])
+      length(x[which(x < pp_qu[1])])
     }),
     ph_pr_qu2 = sapply(ph_pr, function(x) {
-      length(x[which(x >= ph_pr_qu_subtlex_us[1] & x < ph_pr_qu_subtlex_us[2])])
+      length(x[which(x >= pp_qu[1] & x < pp_qu[2])])
     }),
     ph_pr_qu3 = sapply(ph_pr, function(x) {
-      length(x[which(x >= ph_pr_qu_subtlex_us[2] & x < ph_pr_qu_subtlex_us[3])])
+      length(x[which(x >= pp_qu[2] & x < pp_qu[3])])
     }),
     ph_pr_qu4 = sapply(ph_pr, function(x) {
-      length(x[which(x >= ph_pr_qu_subtlex_us[3])])
+      length(x[which(x >= pp_qu[3])])
     })
     ) %>%
     group_by(baby) %>%
@@ -105,3 +110,62 @@ quartiles_sets <- function(df) {
 chi_uni_on_subtlex_us <- quartiles_sets(chi_uni_on_subtlex_us)
 mot_uni_on_subtlex_us <- quartiles_sets(mot_uni_on_subtlex_us)
 mod_on_subtlex_us <- quartiles_sets(mod_on_subtlex_us)
+
+#### log pp - phonemic lengths ####
+log_pp_lengths <- list()
+
+# quartiles on 2:6 phonemes
+for (df in c("chi_uni_len2", "chi_uni_len3", "chi_uni_len4", "chi_uni_len5", "chi_uni_len6",
+             "mod_len2", "mod_len3", "mod_len4", "mod_len5", "mod_len6")) {
+  log_pp_lengths[[df]] <- df %>%
+    get() %>%
+    assign_subtlex_us_pp(var = phon_plu) %>%
+    quartiles_sets(pp_qu = pp_qu_subtlex_us(mot_uni_len23456$phon_plu, 
+                                            chi_uni_len23456$phon_plu))
+} ; rm(df)
+
+# quartiles on each phonemic length
+for (df in c("chi_uni_len2b",
+             "mod_len2b")) {
+  log_pp_lengths[[df]] <- df %>%
+    get() %>%
+    assign_subtlex_us_pp(var = phon_plu) %>%
+    quartiles_sets(pp_qu = pp_qu_subtlex_us(mot_uni_len2$phon_plu, 
+                                            chi_uni_len2$phon_plu))
+} ; rm(df)
+
+for (df in c("chi_uni_len3b",
+             "mod_len3b")) {
+  log_pp_lengths[[df]] <- df %>%
+    get() %>%
+    assign_subtlex_us_pp(var = phon_plu) %>%
+    quartiles_sets(pp_qu = pp_qu_subtlex_us(mot_uni_len3$phon_plu, 
+                                            chi_uni_len3$phon_plu))
+} ; rm(df)
+
+for (df in c("chi_uni_len4b",
+             "mod_len4b")) {
+  log_pp_lengths[[df]] <- df %>%
+    get() %>%
+    assign_subtlex_us_pp(var = phon_plu) %>%
+    quartiles_sets(pp_qu = pp_qu_subtlex_us(mot_uni_len4$phon_plu, 
+                                            chi_uni_len4$phon_plu))
+} ; rm(df)
+
+for (df in c("chi_uni_len5b",
+             "mod_len5b")) {
+  log_pp_lengths[[df]] <- df %>%
+    get() %>%
+    assign_subtlex_us_pp(var = phon_plu) %>%
+    quartiles_sets(pp_qu = pp_qu_subtlex_us(mot_uni_len5$phon_plu, 
+                                            chi_uni_len5$phon_plu))
+} ; rm(df)
+
+for (df in c("chi_uni_len6b",
+             "mod_len6b")) {
+  log_pp_lengths[[df]] <- df %>%
+    get() %>%
+    assign_subtlex_us_pp(var = phon_plu) %>%
+    quartiles_sets(pp_qu = pp_qu_subtlex_us(mot_uni_len6$phon_plu, 
+                                            chi_uni_len6$phon_plu))
+} ; rm(df)

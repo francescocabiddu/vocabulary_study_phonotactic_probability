@@ -1,0 +1,250 @@
+---
+output:
+  word_document:
+    toc: yes
+    reference_docx: template1.docx
+toc-title: 'Vocabulary paper: results - Weighted photactic probability (v1)'
+
+---
+
+<!-- loading packages, user-defined functions and datasets -->
+```{r echo=FALSE, warning=FALSE, message=FALSE, cache=FALSE, include=FALSE}
+lib <- c("ggplot2", "dplyr","stringr","knitr","gridExtra",
+         "lme4","car","kableExtra", "magick", "grid")
+lapply(lib, require, character.only = TRUE)
+load(file="ws2.RData")
+
+options(knitr.table.format = 'markdown')
+```
+
+<!-- set folder for graphs -->
+```{r opts, echo = FALSE}
+knitr::opts_chunk$set(
+  fig.path = "images/"
+)
+```
+
+<!-- additional funs -->
+```{r echo = FALSE}
+grid_arrange_shared_legend <- function(..., nrow = 1,y_title, x_size, y_size,widths1 = 2, widths2=0.2,hjust1=1, x_title, ncol = length(list(...)), position = c("bottom", "right")) {
+
+  plots <- list(...)
+  position <- match.arg(position)
+  g <- ggplotGrob(plots[[1]] + theme(legend.position = position))$grobs
+  legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
+  lheight <- sum(legend$height)
+  lwidth <- sum(legend$width)
+  gl <- lapply(plots, function(x) x + theme(legend.position = "none"))
+  gl <- c(gl, nrow = nrow, ncol = ncol)
+
+  combined <- switch(position,
+                     "bottom" = arrangeGrob(do.call(arrangeGrob, gl),
+                                            legend,
+                                            ncol = 1,
+                                            heights = unit.c(unit(1, "npc") - lheight, lheight)),
+                     "right" = arrangeGrob(do.call(arrangeGrob, gl),
+                                           legend,
+                                           ncol = 2,
+                                           widths = c(widths1, widths2),
+                                           left=textGrob(y_title, gp=gpar(fontsize=y_size), rot = 90),
+                                           bottom=textGrob(x_title, gp=gpar(fontsize=x_size), vjust = 0, hjust = hjust1)))
+  grid.newpage()
+  grid.draw(combined)
+
+}
+
+```
+
+### Phonotactic probability
+
+<br>
+
+Weighted phonotactic probability measure based on written log (base 10) word frequencies from the [SUBTLEXus database](https://www.ugent.be/pp/experimentele-psychologie/en/research/documents/subtlexus) (Brysbaert & New, 2009). 
+
+<br>
+
+#### Quantiles table
+
+```{r echo = FALSE}
+subtlex_us_pp %>%
+  .$unsLBPAV %>%
+  quantile(na.rm = TRUE) %>%
+  as.matrix() %>%
+  t() %>%
+  kable()
+```
+
+<br>
+
+```{r logpp_main, echo = FALSE, results='asis', fig.width=16, fig.height=9}
+plot_pp <- function(df, main_title) {
+  ggplot(df, aes(x=section, y=ph_pr_qu1_perc, fill=baby, shape="Q1")) + 
+  geom_point(size=4, alpha=0.2) +
+  scale_x_continuous(breaks=c(1, seq(5,20, 5))) +
+  labs(x = " ", y = " ") +
+  ggtitle(main_title) +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) +
+  geom_point(aes(x=section, y=ph_pr_qu2_perc, fill=baby, shape="Q2"),size=4, alpha=0.2) + 
+  geom_point(aes(x=section, y=ph_pr_qu3_perc, fill=baby, shape="Q3"), size=4,alpha=0.2) + 
+  geom_point(aes(x=section, y=ph_pr_qu4_perc, fill=baby, shape="Q4"), size=4,alpha=0.2) + 
+  scale_shape_manual("IPhOD Quartile", values=c(`Q1`= 0, `Q2`= 3, `Q3` = 2, `Q4`=1),
+                     breaks=c("Q1","Q2", "Q3","Q4"))+
+  scale_y_continuous(limits=c(0, 70), breaks=seq(0, 70, by = 10))+
+  guides(fill=FALSE)+
+  geom_smooth(aes(x=section, y=ph_pr_qu1_perc,linetype="Q1"), fill=NA, colour="black", method="lm", size=0.8)+
+  geom_smooth(aes(x=section, y=ph_pr_qu2_perc,linetype="Q2"), fill=NA, colour="black", method="lm", size=0.8)+
+  geom_smooth(aes(x=section, y=ph_pr_qu3_perc,linetype="Q3"), fill=NA, colour="black", method="lm", size=0.8)+
+  geom_smooth(aes(x=section, y=ph_pr_qu4_perc,linetype="Q4"), fill=NA, colour="black", method="lm", size=0.8)+
+  theme(axis.text=element_text(size=18),         legend.text = element_text(size = 20),         legend.title = element_text(size = 20),         legend.key.size = unit(1, "cm"))+     scale_colour_grey(start = 0, end = .9)+
+  scale_linetype_manual("IPhOD Quartile", values=c(`Q4` = "dotdash", `Q1` = "longdash",`Q2` = "solid", `Q3`= "dotted"), breaks=c("Q1","Q2", "Q3","Q4"))
+}
+
+plot1 <- plot_pp(chi_uni_on_subtlex_us, "Children") 
+plot2 <- plot_pp(mod_on_subtlex_us, "Model") 
+plot3 <- plot_pp(mot_uni_on_subtlex_us, "Mothers") 
+
+grid_arrange_shared_legend(plot3, plot1, plot2, position = "right", 
+                           x_title = "Stage", y_title = "Novel words (%)",
+                           x_size = 25, y_size = 25,
+                           widths1 = 2, widths2 = 0.5, hjust1 = 1)
+```
+
+**Figure.** Breakdown of PP by quartile
+
+<br>
+
+### Phonotactic probability at each phonemic word length
+
+<br>
+
+```{r logpp_length1, echo = FALSE, results='asis', fig.width=14, fig.height=6}
+table_chi_len2 <- c(sum(log_pp_lengths[["chi_uni_len2"]]$ph_pr_qu1), sum(log_pp_lengths[["chi_uni_len2"]]$ph_pr_qu2),sum(log_pp_lengths[["chi_uni_len2"]]$ph_pr_qu3),sum(log_pp_lengths[["chi_uni_len2"]]$ph_pr_qu4))
+table_chi_len2 <- table_chi_len2/sum(table_chi_len2)*100
+table_chi_len3 <- c(sum(log_pp_lengths[["chi_uni_len3"]]$ph_pr_qu1), sum(log_pp_lengths[["chi_uni_len3"]]$ph_pr_qu2),sum(log_pp_lengths[["chi_uni_len3"]]$ph_pr_qu3),sum(log_pp_lengths[["chi_uni_len3"]]$ph_pr_qu4))
+table_chi_len3 <- table_chi_len3/sum(table_chi_len3)*100
+table_chi_len4 <- c(sum(log_pp_lengths[["chi_uni_len4"]]$ph_pr_qu1), sum(log_pp_lengths[["chi_uni_len4"]]$ph_pr_qu2),sum(log_pp_lengths[["chi_uni_len4"]]$ph_pr_qu3),sum(log_pp_lengths[["chi_uni_len4"]]$ph_pr_qu4))
+table_chi_len4 <- table_chi_len4/sum(table_chi_len4)*100
+table_chi_len5 <- c(sum(log_pp_lengths[["chi_uni_len5"]]$ph_pr_qu1), sum(log_pp_lengths[["chi_uni_len5"]]$ph_pr_qu2),sum(log_pp_lengths[["chi_uni_len5"]]$ph_pr_qu3),sum(log_pp_lengths[["chi_uni_len5"]]$ph_pr_qu4))
+table_chi_len5 <- table_chi_len5/sum(table_chi_len5)*100
+table_chi_len6 <- c(sum(log_pp_lengths[["chi_uni_len6"]]$ph_pr_qu1), sum(log_pp_lengths[["chi_uni_len6"]]$ph_pr_qu2),sum(log_pp_lengths[["chi_uni_len6"]]$ph_pr_qu3),sum(log_pp_lengths[["chi_uni_len6"]]$ph_pr_qu4))
+table_chi_len6 <- table_chi_len6/sum(table_chi_len6)*100
+table <- data.frame(`Phonemic length` = c(rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
+                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
+                    `Novel words (%)`= c(table_chi_len2,table_chi_len3,table_chi_len4,table_chi_len5,table_chi_len6), check.names = F)
+table$`Phonemic length` <- as.factor(table$`Phonemic length`)
+table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) + 
+  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
+  scale_fill_grey()+
+  theme(axis.text=element_text(size=20),
+        axis.title=element_text(size=20),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size = 20),
+        legend.key.size = unit(1,"cm"))+
+  ggtitle("Children") +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) 
+```
+
+**Figure .** CHILD breakdown with quartiles computed for 2-6 phonemes across all mother and child words, using the same quartiles to breakdown each length
+
+<br>
+
+```{r logpp_length2, echo = FALSE, results='asis', fig.width=14, fig.height=6}
+table_chi_len2 <- c(sum(log_pp_lengths[["mod_len2"]]$ph_pr_qu1), sum(log_pp_lengths[["mod_len2"]]$ph_pr_qu2),sum(log_pp_lengths[["mod_len2"]]$ph_pr_qu3),sum(log_pp_lengths[["mod_len2"]]$ph_pr_qu4))
+table_chi_len2 <- table_chi_len2/sum(table_chi_len2)*100
+table_chi_len3 <- c(sum(log_pp_lengths[["mod_len3"]]$ph_pr_qu1), sum(log_pp_lengths[["mod_len3"]]$ph_pr_qu2),sum(log_pp_lengths[["mod_len3"]]$ph_pr_qu3),sum(log_pp_lengths[["mod_len3"]]$ph_pr_qu4))
+table_chi_len3 <- table_chi_len3/sum(table_chi_len3)*100
+table_chi_len4 <- c(sum(log_pp_lengths[["mod_len4"]]$ph_pr_qu1), sum(log_pp_lengths[["mod_len4"]]$ph_pr_qu2),sum(log_pp_lengths[["mod_len4"]]$ph_pr_qu3),sum(log_pp_lengths[["mod_len4"]]$ph_pr_qu4))
+table_chi_len4 <- table_chi_len4/sum(table_chi_len4)*100
+table_chi_len5 <- c(sum(log_pp_lengths[["mod_len5"]]$ph_pr_qu1), sum(log_pp_lengths[["mod_len5"]]$ph_pr_qu2),sum(log_pp_lengths[["mod_len5"]]$ph_pr_qu3),sum(log_pp_lengths[["mod_len5"]]$ph_pr_qu4))
+table_chi_len5 <- table_chi_len5/sum(table_chi_len5)*100
+table_chi_len6 <- c(sum(log_pp_lengths[["mod_len6"]]$ph_pr_qu1), sum(log_pp_lengths[["mod_len6"]]$ph_pr_qu2),sum(log_pp_lengths[["mod_len6"]]$ph_pr_qu3),sum(log_pp_lengths[["mod_len6"]]$ph_pr_qu4))
+table_chi_len6 <- table_chi_len6/sum(table_chi_len6)*100
+table <- data.frame(`Phonemic length` = c(rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
+                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
+                    `Novel words (%)`= c(table_chi_len2,table_chi_len3,table_chi_len4,table_chi_len5,table_chi_len6), check.names = F)
+table$`Phonemic length` <- as.factor(table$`Phonemic length`)
+table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) + 
+  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
+  scale_fill_grey()+
+  theme(axis.text=element_text(size=20),
+        axis.title=element_text(size=20),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size = 20),
+        legend.key.size = unit(1,"cm"))+
+  ggtitle("Model") +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) 
+```
+
+**Figure .** MODEL breakdown with quartiles computed for 2-6 phonemes across all mother and child words, using the same quartiles to breakdown each length
+
+<br>
+
+```{r logpp_length3, echo = FALSE, results='asis', fig.width=14, fig.height=6}
+table_chi_len2b <- c(sum(log_pp_lengths[["chi_uni_len2b"]]$ph_pr_qu1), sum(log_pp_lengths[["chi_uni_len2b"]]$ph_pr_qu2),sum(log_pp_lengths[["chi_uni_len2b"]]$ph_pr_qu3),sum(log_pp_lengths[["chi_uni_len2b"]]$ph_pr_qu4))
+table_chi_len2b <- table_chi_len2b/sum(table_chi_len2b)*100
+
+table_chi_len3b <- c(sum(log_pp_lengths[["chi_uni_len3b"]]$ph_pr_qu1), sum(log_pp_lengths[["chi_uni_len3b"]]$ph_pr_qu2),sum(log_pp_lengths[["chi_uni_len3b"]]$ph_pr_qu3),sum(log_pp_lengths[["chi_uni_len3b"]]$ph_pr_qu4))
+table_chi_len3b <- table_chi_len3b/sum(table_chi_len3b)*100
+table_chi_len4b <- c(sum(log_pp_lengths[["chi_uni_len4b"]]$ph_pr_qu1), sum(log_pp_lengths[["chi_uni_len4b"]]$ph_pr_qu2),sum(log_pp_lengths[["chi_uni_len4b"]]$ph_pr_qu3),sum(log_pp_lengths[["chi_uni_len4b"]]$ph_pr_qu4))
+table_chi_len4b <- table_chi_len4b/sum(table_chi_len4b)*100
+table_chi_len5b <- c(sum(log_pp_lengths[["chi_uni_len5b"]]$ph_pr_qu1), sum(log_pp_lengths[["chi_uni_len5b"]]$ph_pr_qu2),sum(log_pp_lengths[["chi_uni_len5b"]]$ph_pr_qu3),sum(log_pp_lengths[["chi_uni_len5b"]]$ph_pr_qu4))
+table_chi_len5b <- table_chi_len5b/sum(table_chi_len5b)*100
+table_chi_len6b <- c(sum(log_pp_lengths[["chi_uni_len6b"]]$ph_pr_qu1), sum(log_pp_lengths[["chi_uni_len6b"]]$ph_pr_qu2),sum(log_pp_lengths[["chi_uni_len6b"]]$ph_pr_qu3),sum(log_pp_lengths[["chi_uni_len6b"]]$ph_pr_qu4))
+table_chi_len6b <- table_chi_len6b/sum(table_chi_len6b)*100
+table <- data.frame(`Phonemic length` = c(rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
+                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
+                    `Novel words (%)`= c(table_chi_len2b,table_chi_len3b,table_chi_len4b,table_chi_len5b,table_chi_len6b), check.names = F)
+table$`Phonemic length` <- as.factor(table$`Phonemic length`)
+table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) + 
+  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
+  scale_fill_grey()+
+    theme(axis.text=element_text(size=20),
+        axis.title=element_text(size=20),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size = 20),
+        legend.key.size = unit(1,"cm"))+
+  ggtitle("Children") +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) 
+```
+
+**Figure .** CHILD breakdown with quartiles computed for 2-6 phonemes across all mother and child words, this time computing quartiles individually for each phonemic length
+
+<br>
+
+```{r logpp_length4, echo = FALSE, results='asis', fig.width=14, fig.height=6}
+table_chi_len2b <- c(sum(log_pp_lengths[["mod_len2b"]]$ph_pr_qu1), sum(log_pp_lengths[["mod_len2b"]]$ph_pr_qu2),sum(log_pp_lengths[["mod_len2b"]]$ph_pr_qu3),sum(log_pp_lengths[["mod_len2b"]]$ph_pr_qu4))
+table_chi_len2b <- table_chi_len2b/sum(table_chi_len2b)*100
+table_chi_len3b <- c(sum(log_pp_lengths[["mod_len3b"]]$ph_pr_qu1), sum(log_pp_lengths[["mod_len3b"]]$ph_pr_qu2),sum(log_pp_lengths[["mod_len3b"]]$ph_pr_qu3),sum(log_pp_lengths[["mod_len3b"]]$ph_pr_qu4))
+table_chi_len3b <- table_chi_len3b/sum(table_chi_len3b)*100
+table_chi_len4b <- c(sum(log_pp_lengths[["mod_len4b"]]$ph_pr_qu1), sum(log_pp_lengths[["mod_len4b"]]$ph_pr_qu2),sum(log_pp_lengths[["mod_len4b"]]$ph_pr_qu3),sum(log_pp_lengths[["mod_len4b"]]$ph_pr_qu4))
+table_chi_len4b <- table_chi_len4b/sum(table_chi_len4b)*100
+table_chi_len5b <- c(sum(log_pp_lengths[["mod_len5b"]]$ph_pr_qu1), sum(log_pp_lengths[["mod_len5b"]]$ph_pr_qu2),sum(log_pp_lengths[["mod_len5b"]]$ph_pr_qu3),sum(log_pp_lengths[["mod_len5b"]]$ph_pr_qu4))
+table_chi_len5b <- table_chi_len5b/sum(table_chi_len5b)*100
+table_chi_len6b <- c(sum(log_pp_lengths[["mod_len6b"]]$ph_pr_qu1), sum(log_pp_lengths[["mod_len6b"]]$ph_pr_qu2),sum(log_pp_lengths[["mod_len6b"]]$ph_pr_qu3),sum(log_pp_lengths[["mod_len6b"]]$ph_pr_qu4))
+table_chi_len6b <- table_chi_len6b/sum(table_chi_len6b)*100
+table <- data.frame(`Phonemic length` = c(rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
+                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
+                    `Novel words (%)`= c(table_chi_len2b,table_chi_len3b,table_chi_len4b,table_chi_len5b,table_chi_len6b), check.names = F)
+table$`Phonemic length` <- as.factor(table$`Phonemic length`)
+table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) + 
+  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
+  scale_fill_grey()+
+    theme(axis.text=element_text(size=20),
+        axis.title=element_text(size=20),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size = 20),
+        legend.key.size = unit(1,"cm"))+
+  ggtitle("Model") +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) 
+```
+
+**Figure .** MODEL breakdown with quartiles computed for 2-6 phonemes across all mother and child words, this time computing quartiles individually for each phonemic length
+
