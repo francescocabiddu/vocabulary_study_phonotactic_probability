@@ -12,7 +12,7 @@ toc-title: 'Vocabulary paper: results - Weighted photactic probability (v1)'
 lib <- c("ggplot2", "dplyr","stringr","knitr","gridExtra",
          "lme4","car","kableExtra", "magick", "grid")
 lapply(lib, require, character.only = TRUE)
-load(file="ws3.RData")
+load(file="ws4.RData")
 
 options(knitr.table.format = 'markdown')
 ```
@@ -261,6 +261,7 @@ ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) +
 
 ### General Frequency
 IPhOD General Frequency measure based on [SUBTLEXus](https://www.ugent.be/pp/experimentele-psychologie/en/research/documents/subtlexus) (Brysbaert & New, 2009). 
+Words that are not present in IPhOD have no frequency value and therefore were excluded.
 
 <br>
 
@@ -462,7 +463,7 @@ ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) +
 <br> 
 
 ### Maternal Frequency
-Frequency based on Mothers' corpus
+Frequency based on Mothers' corpus. Children's words that are not present in the maternal speech have no frequency value and therefore were excluded. Therefore, words' frequency always starts from 1. This could be seen in the graphs below, where the first quartile (word frequency < 1) contains 0% of words.
 
 <br>
 
@@ -657,3 +658,273 @@ ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) +
 **Figure .** MODEL breakdown with quartiles computed for 2-6 phonemes across all mother and child words, this time computing quartiles individually for each phonemic length
 
 <br> 
+
+### Neighbourhood Density at each general frequency quartile
+
+<br>
+
+```{r nei_freq_1, echo = FALSE, results='asis', fig.width=14, fig.height=6}
+table_chi_len2 <- c(sum(nei_freqs[["chi_nei_freq2"]]$nei_qu1), sum(nei_freqs[["chi_nei_freq2"]]$nei_qu2),sum(nei_freqs[["chi_nei_freq2"]]$nei_qu3),sum(nei_freqs[["chi_nei_freq2"]]$nei_qu4))
+table_chi_len2 <- table_chi_len2/sum(table_chi_len2)*100
+table_chi_len3 <- c(sum(nei_freqs[["chi_nei_freq3"]]$nei_qu1), sum(nei_freqs[["chi_nei_freq3"]]$nei_qu2),sum(nei_freqs[["chi_nei_freq3"]]$nei_qu3),sum(nei_freqs[["chi_nei_freq3"]]$nei_qu4))
+table_chi_len3 <- table_chi_len3/sum(table_chi_len3)*100
+table_chi_len4 <- c(sum(nei_freqs[["chi_nei_freq4"]]$nei_qu1), sum(nei_freqs[["chi_nei_freq4"]]$nei_qu2),sum(nei_freqs[["chi_nei_freq4"]]$nei_qu3),sum(nei_freqs[["chi_nei_freq4"]]$nei_qu4))
+table_chi_len4 <- table_chi_len4/sum(table_chi_len4)*100
+table_chi_len1 <- c(sum(nei_freqs[["chi_nei_freq1"]]$nei_qu1), sum(nei_freqs[["chi_nei_freq1"]]$nei_qu2),sum(nei_freqs[["chi_nei_freq1"]]$nei_qu3),sum(nei_freqs[["chi_nei_freq1"]]$nei_qu4))
+table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
+
+table <- data.frame(`General Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
+                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
+table$`General Frequency` <- as.factor(table$`General Frequency`)
+table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+ggplot(table, aes(`General Frequency`, `Novel words (%)`)) + 
+  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
+  scale_fill_grey()+
+  theme(axis.text=element_text(size=20),
+        axis.title=element_text(size=20),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size = 20),
+        legend.key.size = unit(1,"cm"))+
+  ggtitle("Children") +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) 
+```
+
+**Figure .** CHILD Percentage of words in each ND quartile across general frequency quartiles
+
+<br>
+
+```{r nei_freq_2, echo = FALSE, results='asis', fig.width=14, fig.height=6}
+table_chi_len2 <- c(sum(nei_freqs[["mod_nei_freq2"]]$nei_qu1), sum(nei_freqs[["mod_nei_freq2"]]$nei_qu2),sum(nei_freqs[["mod_nei_freq2"]]$nei_qu3),sum(nei_freqs[["mod_nei_freq2"]]$nei_qu4))
+table_chi_len2 <- table_chi_len2/sum(table_chi_len2)*100
+table_chi_len3 <- c(sum(nei_freqs[["mod_nei_freq3"]]$nei_qu1), sum(nei_freqs[["mod_nei_freq3"]]$nei_qu2),sum(nei_freqs[["mod_nei_freq3"]]$nei_qu3),sum(nei_freqs[["mod_nei_freq3"]]$nei_qu4))
+table_chi_len3 <- table_chi_len3/sum(table_chi_len3)*100
+table_chi_len4 <- c(sum(nei_freqs[["mod_nei_freq4"]]$nei_qu1), sum(nei_freqs[["mod_nei_freq4"]]$nei_qu2),sum(nei_freqs[["mod_nei_freq4"]]$nei_qu3),sum(nei_freqs[["mod_nei_freq4"]]$nei_qu4))
+table_chi_len4 <- table_chi_len4/sum(table_chi_len4)*100
+table_chi_len1 <- c(sum(nei_freqs[["mod_nei_freq1"]]$nei_qu1), sum(nei_freqs[["mod_nei_freq1"]]$nei_qu2),sum(nei_freqs[["mod_nei_freq1"]]$nei_qu3),sum(nei_freqs[["mod_nei_freq1"]]$nei_qu4))
+table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
+
+table <- data.frame(`General Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
+                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
+table$`General Frequency` <- as.factor(table$`General Frequency`)
+table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+ggplot(table, aes(`General Frequency`, `Novel words (%)`)) + 
+  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
+  scale_fill_grey()+
+  theme(axis.text=element_text(size=20),
+        axis.title=element_text(size=20),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size = 20),
+        legend.key.size = unit(1,"cm"))+
+  ggtitle("Model") +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) 
+```
+
+**Figure .** Model Percentage of words in each ND quartile across general frequency quartiles
+
+<br> 
+
+### Neighbourhood Density at each maternal frequency quartile
+
+<br>
+
+```{r nei_mot_freq_1, echo = FALSE, results='asis', fig.width=14, fig.height=6, warning=FALSE, message=FALSE}
+table_chi_len2 <- c(sum(nei_mot_freqs[["chi_nei_freq2"]]$nei_qu1), sum(nei_mot_freqs[["chi_nei_freq2"]]$nei_qu2),sum(nei_mot_freqs[["chi_nei_freq2"]]$nei_qu3),sum(nei_mot_freqs[["chi_nei_freq2"]]$nei_qu4))
+table_chi_len2 <- table_chi_len2/sum(table_chi_len2)*100
+table_chi_len3 <- c(sum(nei_mot_freqs[["chi_nei_freq3"]]$nei_qu1), sum(nei_mot_freqs[["chi_nei_freq3"]]$nei_qu2),sum(nei_mot_freqs[["chi_nei_freq3"]]$nei_qu3),sum(nei_mot_freqs[["chi_nei_freq3"]]$nei_qu4))
+table_chi_len3 <- table_chi_len3/sum(table_chi_len3)*100
+table_chi_len4 <- c(sum(nei_mot_freqs[["chi_nei_freq4"]]$nei_qu1), sum(nei_mot_freqs[["chi_nei_freq4"]]$nei_qu2),sum(nei_mot_freqs[["chi_nei_freq4"]]$nei_qu3),sum(nei_mot_freqs[["chi_nei_freq4"]]$nei_qu4))
+table_chi_len4 <- table_chi_len4/sum(table_chi_len4)*100
+table_chi_len1 <- c(sum(nei_mot_freqs[["chi_nei_freq1"]]$nei_qu1), sum(nei_mot_freqs[["chi_nei_freq1"]]$nei_qu2),sum(nei_mot_freqs[["chi_nei_freq1"]]$nei_qu3),sum(nei_mot_freqs[["chi_nei_freq1"]]$nei_qu4))
+table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
+
+table <- data.frame(`Maternal Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
+                    `Mot quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
+table$`Maternal Frequency` <- as.factor(table$`Maternal Frequency`)
+table$`Mot quartile` <- as.factor(table$`Mot quartile`)
+ggplot(table, aes(`Maternal Frequency`, `Novel words (%)`)) + 
+  geom_bar(aes(fill = `Mot quartile`), stat = "identity", position = "dodge")+
+  scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
+  scale_fill_grey()+
+  theme(axis.text=element_text(size=20),
+        axis.title=element_text(size=20),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size = 20),
+        legend.key.size = unit(1,"cm"))+
+  ggtitle("Children") +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) 
+```
+
+**Figure .** CHILD Percentage of words in each ND quartile across Maternal Frequency quartiles
+
+<br>
+
+```{r nei_mot_freq_2, echo = FALSE, results='asis', fig.width=14, fig.height=6, warning=FALSE, message=FALSE}
+table_chi_len2 <- c(sum(nei_mot_freqs[["mod_nei_freq2"]]$nei_qu1), sum(nei_mot_freqs[["mod_nei_freq2"]]$nei_qu2),sum(nei_mot_freqs[["mod_nei_freq2"]]$nei_qu3),sum(nei_mot_freqs[["mod_nei_freq2"]]$nei_qu4))
+table_chi_len2 <- table_chi_len2/sum(table_chi_len2)*100
+table_chi_len3 <- c(sum(nei_mot_freqs[["mod_nei_freq3"]]$nei_qu1), sum(nei_mot_freqs[["mod_nei_freq3"]]$nei_qu2),sum(nei_mot_freqs[["mod_nei_freq3"]]$nei_qu3),sum(nei_mot_freqs[["mod_nei_freq3"]]$nei_qu4))
+table_chi_len3 <- table_chi_len3/sum(table_chi_len3)*100
+table_chi_len4 <- c(sum(nei_mot_freqs[["mod_nei_freq4"]]$nei_qu1), sum(nei_mot_freqs[["mod_nei_freq4"]]$nei_qu2),sum(nei_mot_freqs[["mod_nei_freq4"]]$nei_qu3),sum(nei_mot_freqs[["mod_nei_freq4"]]$nei_qu4))
+table_chi_len4 <- table_chi_len4/sum(table_chi_len4)*100
+table_chi_len1 <- c(sum(nei_mot_freqs[["mod_nei_freq1"]]$nei_qu1), sum(nei_mot_freqs[["mod_nei_freq1"]]$nei_qu2),sum(nei_mot_freqs[["mod_nei_freq1"]]$nei_qu3),sum(nei_mot_freqs[["mod_nei_freq1"]]$nei_qu4))
+table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
+
+table <- data.frame(`Maternal Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
+                    `Mot quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
+table$`Maternal Frequency` <- as.factor(table$`Maternal Frequency`)
+table$`Mot quartile` <- as.factor(table$`Mot quartile`)
+ggplot(table, aes(`Maternal Frequency`, `Novel words (%)`)) + 
+  geom_bar(aes(fill = `Mot quartile`), stat = "identity", position = "dodge")+
+  scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
+  scale_fill_grey()+
+  theme(axis.text=element_text(size=20),
+        axis.title=element_text(size=20),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size = 20),
+        legend.key.size = unit(1,"cm"))+
+  ggtitle("Model") +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) 
+```
+
+**Figure .** Model Percentage of words in each ND quartile across Maternal Frequency quartiles
+
+<br> 
+
+### Phonotactic probability at each general frequency quartile
+
+<br>
+
+```{r pp_freq_1, echo = FALSE, results='asis', fig.width=14, fig.height=6}
+table_chi_len2 <- c(sum(pp_freqs[["chi_pp_freq2"]]$ph_pr_qu1), sum(pp_freqs[["chi_pp_freq2"]]$ph_pr_qu2),sum(pp_freqs[["chi_pp_freq2"]]$ph_pr_qu3),sum(pp_freqs[["chi_pp_freq2"]]$ph_pr_qu4))
+table_chi_len2 <- table_chi_len2/sum(table_chi_len2)*100
+table_chi_len3 <- c(sum(pp_freqs[["chi_pp_freq3"]]$ph_pr_qu1), sum(pp_freqs[["chi_pp_freq3"]]$ph_pr_qu2),sum(pp_freqs[["chi_pp_freq3"]]$ph_pr_qu3),sum(pp_freqs[["chi_pp_freq3"]]$ph_pr_qu4))
+table_chi_len3 <- table_chi_len3/sum(table_chi_len3)*100
+table_chi_len4 <- c(sum(pp_freqs[["chi_pp_freq4"]]$ph_pr_qu1), sum(pp_freqs[["chi_pp_freq4"]]$ph_pr_qu2),sum(pp_freqs[["chi_pp_freq4"]]$ph_pr_qu3),sum(pp_freqs[["chi_pp_freq4"]]$ph_pr_qu4))
+table_chi_len4 <- table_chi_len4/sum(table_chi_len4)*100
+table_chi_len1 <- c(sum(pp_freqs[["chi_pp_freq1"]]$ph_pr_qu1), sum(pp_freqs[["chi_pp_freq1"]]$ph_pr_qu2),sum(pp_freqs[["chi_pp_freq1"]]$ph_pr_qu3),sum(pp_freqs[["chi_pp_freq1"]]$ph_pr_qu4))
+table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
+
+table <- data.frame(`General Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
+                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
+table$`General Frequency` <- as.factor(table$`General Frequency`)
+table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+ggplot(table, aes(`General Frequency`, `Novel words (%)`)) + 
+  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
+  scale_fill_grey()+
+  theme(axis.text=element_text(size=20),
+        axis.title=element_text(size=20),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size = 20),
+        legend.key.size = unit(1,"cm"))+
+  ggtitle("Children") +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) 
+```
+
+**Figure .** CHILD Percentage of words in each LOG PP quartile across general frequency quartiles
+
+<br>
+
+```{r pp_freq_2, echo = FALSE, results='asis', fig.width=14, fig.height=6}
+table_chi_len2 <- c(sum(pp_freqs[["mod_pp_freq2"]]$ph_pr_qu1), sum(pp_freqs[["mod_pp_freq2"]]$ph_pr_qu2),sum(pp_freqs[["mod_pp_freq2"]]$ph_pr_qu3),sum(pp_freqs[["mod_pp_freq2"]]$ph_pr_qu4))
+table_chi_len2 <- table_chi_len2/sum(table_chi_len2)*100
+table_chi_len3 <- c(sum(pp_freqs[["mod_pp_freq3"]]$ph_pr_qu1), sum(pp_freqs[["mod_pp_freq3"]]$ph_pr_qu2),sum(pp_freqs[["mod_pp_freq3"]]$ph_pr_qu3),sum(pp_freqs[["mod_pp_freq3"]]$ph_pr_qu4))
+table_chi_len3 <- table_chi_len3/sum(table_chi_len3)*100
+table_chi_len4 <- c(sum(pp_freqs[["mod_pp_freq4"]]$ph_pr_qu1), sum(pp_freqs[["mod_pp_freq4"]]$ph_pr_qu2),sum(pp_freqs[["mod_pp_freq4"]]$ph_pr_qu3),sum(pp_freqs[["mod_pp_freq4"]]$ph_pr_qu4))
+table_chi_len4 <- table_chi_len4/sum(table_chi_len4)*100
+table_chi_len1 <- c(sum(pp_freqs[["mod_pp_freq1"]]$ph_pr_qu1), sum(pp_freqs[["mod_pp_freq1"]]$ph_pr_qu2),sum(pp_freqs[["mod_pp_freq1"]]$ph_pr_qu3),sum(pp_freqs[["mod_pp_freq1"]]$ph_pr_qu4))
+table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
+
+table <- data.frame(`General Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
+                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
+table$`General Frequency` <- as.factor(table$`General Frequency`)
+table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+ggplot(table, aes(`General Frequency`, `Novel words (%)`)) + 
+  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
+  scale_fill_grey()+
+  theme(axis.text=element_text(size=20),
+        axis.title=element_text(size=20),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size = 20),
+        legend.key.size = unit(1,"cm"))+
+  ggtitle("Model") +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) 
+```
+
+**Figure .** Model Percentage of words in each LOG PP quartile across general frequency quartiles
+
+<br> 
+
+### Phonotactic probability at each maternal frequency quartile
+
+<br>
+
+```{r pp_mot_freq_1, echo = FALSE, results='asis', fig.width=14, fig.height=6, warning=FALSE, message=FALSE}
+table_chi_len2 <- c(sum(pp_mot_freqs[["chi_pp_freq2"]]$ph_pr_qu1), sum(pp_mot_freqs[["chi_pp_freq2"]]$ph_pr_qu2),sum(pp_mot_freqs[["chi_pp_freq2"]]$ph_pr_qu3),sum(pp_mot_freqs[["chi_pp_freq2"]]$ph_pr_qu4))
+table_chi_len2 <- table_chi_len2/sum(table_chi_len2)*100
+table_chi_len3 <- c(sum(pp_mot_freqs[["chi_pp_freq3"]]$ph_pr_qu1), sum(pp_mot_freqs[["chi_pp_freq3"]]$ph_pr_qu2),sum(pp_mot_freqs[["chi_pp_freq3"]]$ph_pr_qu3),sum(pp_mot_freqs[["chi_pp_freq3"]]$ph_pr_qu4))
+table_chi_len3 <- table_chi_len3/sum(table_chi_len3)*100
+table_chi_len4 <- c(sum(pp_mot_freqs[["chi_pp_freq4"]]$ph_pr_qu1), sum(pp_mot_freqs[["chi_pp_freq4"]]$ph_pr_qu2),sum(pp_mot_freqs[["chi_pp_freq4"]]$ph_pr_qu3),sum(pp_mot_freqs[["chi_pp_freq4"]]$ph_pr_qu4))
+table_chi_len4 <- table_chi_len4/sum(table_chi_len4)*100
+table_chi_len1 <- c(sum(pp_mot_freqs[["chi_pp_freq1"]]$ph_pr_qu1), sum(pp_mot_freqs[["chi_pp_freq1"]]$ph_pr_qu2),sum(pp_mot_freqs[["chi_pp_freq1"]]$ph_pr_qu3),sum(pp_mot_freqs[["chi_pp_freq1"]]$ph_pr_qu4))
+table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
+
+table <- data.frame(`Maternal Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
+                    `Mot quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
+table$`Maternal Frequency` <- as.factor(table$`Maternal Frequency`)
+table$`Mot quartile` <- as.factor(table$`Mot quartile`)
+ggplot(table, aes(`Maternal Frequency`, `Novel words (%)`)) + 
+  geom_bar(aes(fill = `Mot quartile`), stat = "identity", position = "dodge")+
+  scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
+  scale_fill_grey()+
+  theme(axis.text=element_text(size=20),
+        axis.title=element_text(size=20),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size = 20),
+        legend.key.size = unit(1,"cm"))+
+  ggtitle("Children") +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) 
+```
+
+**Figure .** CHILD Percentage of words in each LOG PP quartile across Maternal Frequency quartiles
+
+<br>
+
+```{r pp_mot_freq_2, echo = FALSE, results='asis', fig.width=14, fig.height=6, warning=FALSE, message=FALSE}
+table_chi_len2 <- c(sum(pp_mot_freqs[["mod_pp_freq2"]]$ph_pr_qu1), sum(pp_mot_freqs[["mod_pp_freq2"]]$ph_pr_qu2),sum(pp_mot_freqs[["mod_pp_freq2"]]$ph_pr_qu3),sum(pp_mot_freqs[["mod_pp_freq2"]]$ph_pr_qu4))
+table_chi_len2 <- table_chi_len2/sum(table_chi_len2)*100
+table_chi_len3 <- c(sum(pp_mot_freqs[["mod_pp_freq3"]]$ph_pr_qu1), sum(pp_mot_freqs[["mod_pp_freq3"]]$ph_pr_qu2),sum(pp_mot_freqs[["mod_pp_freq3"]]$ph_pr_qu3),sum(pp_mot_freqs[["mod_pp_freq3"]]$ph_pr_qu4))
+table_chi_len3 <- table_chi_len3/sum(table_chi_len3)*100
+table_chi_len4 <- c(sum(pp_mot_freqs[["mod_pp_freq4"]]$ph_pr_qu1), sum(pp_mot_freqs[["mod_pp_freq4"]]$ph_pr_qu2),sum(pp_mot_freqs[["mod_pp_freq4"]]$ph_pr_qu3),sum(pp_mot_freqs[["mod_pp_freq4"]]$ph_pr_qu4))
+table_chi_len4 <- table_chi_len4/sum(table_chi_len4)*100
+table_chi_len1 <- c(sum(pp_mot_freqs[["mod_pp_freq1"]]$ph_pr_qu1), sum(pp_mot_freqs[["mod_pp_freq1"]]$ph_pr_qu2),sum(pp_mot_freqs[["mod_pp_freq1"]]$ph_pr_qu3),sum(pp_mot_freqs[["mod_pp_freq1"]]$ph_pr_qu4))
+table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
+
+table <- data.frame(`Maternal Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
+                    `Mot quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
+table$`Maternal Frequency` <- as.factor(table$`Maternal Frequency`)
+table$`Mot quartile` <- as.factor(table$`Mot quartile`)
+ggplot(table, aes(`Maternal Frequency`, `Novel words (%)`)) + 
+  geom_bar(aes(fill = `Mot quartile`), stat = "identity", position = "dodge")+
+  scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
+  scale_fill_grey()+
+  theme(axis.text=element_text(size=20),
+        axis.title=element_text(size=20),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size = 20),
+        legend.key.size = unit(1,"cm"))+
+  ggtitle("Model") +
+  theme(plot.title = element_text(hjust = 0.5, size = 25)) 
+```
+
+**Figure .** Model Percentage of words in each LOG PP quartile across Maternal Frequency quartiles
