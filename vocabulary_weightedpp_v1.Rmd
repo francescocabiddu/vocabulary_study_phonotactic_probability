@@ -3,7 +3,7 @@ output:
   word_document:
     toc: yes
     reference_docx: template1.docx
-toc-title: 'Vocabulary paper: results - Weighted photactic probability (v1)'
+toc-title: 'Vocabulary paper results: Weighted photactic probability + Frequency (v3)'
 
 ---
 
@@ -96,7 +96,7 @@ plot_pp <- function(df, main_title) {
   geom_point(aes(x=section, y=ph_pr_qu2_perc, fill=baby, shape="Q2"),size=4, alpha=0.2) + 
   geom_point(aes(x=section, y=ph_pr_qu3_perc, fill=baby, shape="Q3"), size=4,alpha=0.2) + 
   geom_point(aes(x=section, y=ph_pr_qu4_perc, fill=baby, shape="Q4"), size=4,alpha=0.2) + 
-  scale_shape_manual("IPhOD Quartile", values=c(`Q1`= 0, `Q2`= 3, `Q3` = 2, `Q4`=1),
+  scale_shape_manual("PP Quartile", values=c(`Q1`= 0, `Q2`= 3, `Q3` = 2, `Q4`=1),
                      breaks=c("Q1","Q2", "Q3","Q4"))+
   scale_y_continuous(limits=c(0, 70), breaks=seq(0, 70, by = 10))+
   guides(fill=FALSE)+
@@ -105,7 +105,7 @@ plot_pp <- function(df, main_title) {
   geom_smooth(aes(x=section, y=ph_pr_qu3_perc,linetype="Q3"), fill=NA, colour="black", method="lm", size=0.8)+
   geom_smooth(aes(x=section, y=ph_pr_qu4_perc,linetype="Q4"), fill=NA, colour="black", method="lm", size=0.8)+
   theme(axis.text=element_text(size=18),         legend.text = element_text(size = 20),         legend.title = element_text(size = 20),         legend.key.size = unit(1, "cm"))+     scale_colour_grey(start = 0, end = .9)+
-  scale_linetype_manual("IPhOD Quartile", values=c(`Q4` = "dotdash", `Q1` = "longdash",`Q2` = "solid", `Q3`= "dotted"), breaks=c("Q1","Q2", "Q3","Q4"))
+  scale_linetype_manual("PP Quartile", values=c(`Q4` = "dotdash", `Q1` = "longdash",`Q2` = "solid", `Q3`= "dotted"), breaks=c("Q1","Q2", "Q3","Q4"))
 }
 
 plot1 <- plot_pp(chi_uni_on_subtlex_us, "Children") 
@@ -138,12 +138,12 @@ table_chi_len5 <- table_chi_len5/sum(table_chi_len5)*100
 table_chi_len6 <- c(sum(log_pp_lengths[["chi_uni_len6"]]$ph_pr_qu1), sum(log_pp_lengths[["chi_uni_len6"]]$ph_pr_qu2),sum(log_pp_lengths[["chi_uni_len6"]]$ph_pr_qu3),sum(log_pp_lengths[["chi_uni_len6"]]$ph_pr_qu4))
 table_chi_len6 <- table_chi_len6/sum(table_chi_len6)*100
 table <- data.frame(`Phonemic length` = c(rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
-                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
+                    `PP quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
                     `Novel words (%)`= c(table_chi_len2,table_chi_len3,table_chi_len4,table_chi_len5,table_chi_len6), check.names = F)
 table$`Phonemic length` <- as.factor(table$`Phonemic length`)
-table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+table$`PP quartile` <- as.factor(table$`PP quartile`)
 ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `PP quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
   theme(axis.text=element_text(size=20),
@@ -171,12 +171,12 @@ table_chi_len5 <- table_chi_len5/sum(table_chi_len5)*100
 table_chi_len6 <- c(sum(log_pp_lengths[["mod_len6"]]$ph_pr_qu1), sum(log_pp_lengths[["mod_len6"]]$ph_pr_qu2),sum(log_pp_lengths[["mod_len6"]]$ph_pr_qu3),sum(log_pp_lengths[["mod_len6"]]$ph_pr_qu4))
 table_chi_len6 <- table_chi_len6/sum(table_chi_len6)*100
 table <- data.frame(`Phonemic length` = c(rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
-                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
+                    `PP quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
                     `Novel words (%)`= c(table_chi_len2,table_chi_len3,table_chi_len4,table_chi_len5,table_chi_len6), check.names = F)
 table$`Phonemic length` <- as.factor(table$`Phonemic length`)
-table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+table$`PP quartile` <- as.factor(table$`PP quartile`)
 ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `PP quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
   theme(axis.text=element_text(size=20),
@@ -205,12 +205,12 @@ table_chi_len5b <- table_chi_len5b/sum(table_chi_len5b)*100
 table_chi_len6b <- c(sum(log_pp_lengths[["chi_uni_len6b"]]$ph_pr_qu1), sum(log_pp_lengths[["chi_uni_len6b"]]$ph_pr_qu2),sum(log_pp_lengths[["chi_uni_len6b"]]$ph_pr_qu3),sum(log_pp_lengths[["chi_uni_len6b"]]$ph_pr_qu4))
 table_chi_len6b <- table_chi_len6b/sum(table_chi_len6b)*100
 table <- data.frame(`Phonemic length` = c(rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
-                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
+                    `PP quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
                     `Novel words (%)`= c(table_chi_len2b,table_chi_len3b,table_chi_len4b,table_chi_len5b,table_chi_len6b), check.names = F)
 table$`Phonemic length` <- as.factor(table$`Phonemic length`)
-table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+table$`PP quartile` <- as.factor(table$`PP quartile`)
 ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `PP quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
     theme(axis.text=element_text(size=20),
@@ -238,12 +238,12 @@ table_chi_len5b <- table_chi_len5b/sum(table_chi_len5b)*100
 table_chi_len6b <- c(sum(log_pp_lengths[["mod_len6b"]]$ph_pr_qu1), sum(log_pp_lengths[["mod_len6b"]]$ph_pr_qu2),sum(log_pp_lengths[["mod_len6b"]]$ph_pr_qu3),sum(log_pp_lengths[["mod_len6b"]]$ph_pr_qu4))
 table_chi_len6b <- table_chi_len6b/sum(table_chi_len6b)*100
 table <- data.frame(`Phonemic length` = c(rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
-                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
+                    `PP quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
                     `Novel words (%)`= c(table_chi_len2b,table_chi_len3b,table_chi_len4b,table_chi_len5b,table_chi_len6b), check.names = F)
 table$`Phonemic length` <- as.factor(table$`Phonemic length`)
-table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+table$`PP quartile` <- as.factor(table$`PP quartile`)
 ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `PP quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
     theme(axis.text=element_text(size=20),
@@ -538,12 +538,12 @@ table_chi_len5 <- table_chi_len5/sum(table_chi_len5)*100
 table_chi_len6 <- c(sum(freq_mot_lengths[["chi_uni_len6"]]$freq_qu1), sum(freq_mot_lengths[["chi_uni_len6"]]$freq_qu2),sum(freq_mot_lengths[["chi_uni_len6"]]$freq_qu3),sum(freq_mot_lengths[["chi_uni_len6"]]$freq_qu4))
 table_chi_len6 <- table_chi_len6/sum(table_chi_len6)*100
 table <- data.frame(`Phonemic length` = c(rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
-                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
+                    `Mot quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
                     `Novel words (%)`= c(table_chi_len2,table_chi_len3,table_chi_len4,table_chi_len5,table_chi_len6), check.names = F)
 table$`Phonemic length` <- as.factor(table$`Phonemic length`)
-table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+table$`Mot quartile` <- as.factor(table$`Mot quartile`)
 ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `Mot quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
   theme(axis.text=element_text(size=20),
@@ -571,12 +571,12 @@ table_chi_len5 <- table_chi_len5/sum(table_chi_len5)*100
 table_chi_len6 <- c(sum(freq_mot_lengths[["mod_len6"]]$freq_qu1), sum(freq_mot_lengths[["mod_len6"]]$freq_qu2),sum(freq_mot_lengths[["mod_len6"]]$freq_qu3),sum(freq_mot_lengths[["mod_len6"]]$freq_qu4))
 table_chi_len6 <- table_chi_len6/sum(table_chi_len6)*100
 table <- data.frame(`Phonemic length` = c(rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
-                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
+                    `Mot quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
                     `Novel words (%)`= c(table_chi_len2,table_chi_len3,table_chi_len4,table_chi_len5,table_chi_len6), check.names = F)
 table$`Phonemic length` <- as.factor(table$`Phonemic length`)
-table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+table$`Mot quartile` <- as.factor(table$`Mot quartile`)
 ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `Mot quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
   theme(axis.text=element_text(size=20),
@@ -605,12 +605,12 @@ table_chi_len5b <- table_chi_len5b/sum(table_chi_len5b)*100
 table_chi_len6b <- c(sum(freq_mot_lengths[["chi_uni_len6b"]]$freq_qu1), sum(freq_mot_lengths[["chi_uni_len6b"]]$freq_qu2),sum(freq_mot_lengths[["chi_uni_len6b"]]$freq_qu3),sum(freq_mot_lengths[["chi_uni_len6b"]]$freq_qu4))
 table_chi_len6b <- table_chi_len6b/sum(table_chi_len6b)*100
 table <- data.frame(`Phonemic length` = c(rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
-                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
+                    `Mot quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
                     `Novel words (%)`= c(table_chi_len2b,table_chi_len3b,table_chi_len4b,table_chi_len5b,table_chi_len6b), check.names = F)
 table$`Phonemic length` <- as.factor(table$`Phonemic length`)
-table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+table$`Mot quartile` <- as.factor(table$`Mot quartile`)
 ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `Mot quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
     theme(axis.text=element_text(size=20),
@@ -638,12 +638,12 @@ table_chi_len5b <- table_chi_len5b/sum(table_chi_len5b)*100
 table_chi_len6b <- c(sum(freq_mot_lengths[["mod_len6b"]]$freq_qu1), sum(freq_mot_lengths[["mod_len6b"]]$freq_qu2),sum(freq_mot_lengths[["mod_len6b"]]$freq_qu3),sum(freq_mot_lengths[["mod_len6b"]]$freq_qu4))
 table_chi_len6b <- table_chi_len6b/sum(table_chi_len6b)*100
 table <- data.frame(`Phonemic length` = c(rep(2,4),rep(3,4),rep(4,4),rep(5,4),rep(6,4)),
-                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
+                    `Mot quartile` = rep(c("Q1","Q2","Q3","Q4"),5),
                     `Novel words (%)`= c(table_chi_len2b,table_chi_len3b,table_chi_len4b,table_chi_len5b,table_chi_len6b), check.names = F)
 table$`Phonemic length` <- as.factor(table$`Phonemic length`)
-table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+table$`Mot quartile` <- as.factor(table$`Mot quartile`)
 ggplot(table, aes(`Phonemic length`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `Mot quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
     theme(axis.text=element_text(size=20),
@@ -674,12 +674,12 @@ table_chi_len1 <- c(sum(nei_freqs[["chi_nei_freq1"]]$nei_qu1), sum(nei_freqs[["c
 table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
 
 table <- data.frame(`General Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
-                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `ND quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
                     `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
 table$`General Frequency` <- as.factor(table$`General Frequency`)
-table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+table$`ND quartile` <- as.factor(table$`ND quartile`)
 ggplot(table, aes(`General Frequency`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `ND quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
   theme(axis.text=element_text(size=20),
@@ -706,12 +706,12 @@ table_chi_len1 <- c(sum(nei_freqs[["mod_nei_freq1"]]$nei_qu1), sum(nei_freqs[["m
 table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
 
 table <- data.frame(`General Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
-                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `ND quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
                     `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
 table$`General Frequency` <- as.factor(table$`General Frequency`)
-table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+table$`ND quartile` <- as.factor(table$`ND quartile`)
 ggplot(table, aes(`General Frequency`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `ND quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
   theme(axis.text=element_text(size=20),
@@ -742,12 +742,12 @@ table_chi_len1 <- c(sum(nei_mot_freqs[["chi_nei_freq1"]]$nei_qu1), sum(nei_mot_f
 table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
 
 table <- data.frame(`Maternal Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
-                    `Mot quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `ND quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
                     `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
 table$`Maternal Frequency` <- as.factor(table$`Maternal Frequency`)
-table$`Mot quartile` <- as.factor(table$`Mot quartile`)
+table$`ND quartile` <- as.factor(table$`ND quartile`)
 ggplot(table, aes(`Maternal Frequency`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `Mot quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `ND quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
   theme(axis.text=element_text(size=20),
@@ -774,12 +774,12 @@ table_chi_len1 <- c(sum(nei_mot_freqs[["mod_nei_freq1"]]$nei_qu1), sum(nei_mot_f
 table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
 
 table <- data.frame(`Maternal Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
-                    `Mot quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `ND quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
                     `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
 table$`Maternal Frequency` <- as.factor(table$`Maternal Frequency`)
-table$`Mot quartile` <- as.factor(table$`Mot quartile`)
+table$`ND quartile` <- as.factor(table$`ND quartile`)
 ggplot(table, aes(`Maternal Frequency`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `Mot quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `ND quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
   theme(axis.text=element_text(size=20),
@@ -810,12 +810,12 @@ table_chi_len1 <- c(sum(pp_freqs[["chi_pp_freq1"]]$ph_pr_qu1), sum(pp_freqs[["ch
 table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
 
 table <- data.frame(`General Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
-                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `PP quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
                     `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
 table$`General Frequency` <- as.factor(table$`General Frequency`)
-table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+table$`PP quartile` <- as.factor(table$`PP quartile`)
 ggplot(table, aes(`General Frequency`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `PP quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
   theme(axis.text=element_text(size=20),
@@ -842,12 +842,12 @@ table_chi_len1 <- c(sum(pp_freqs[["mod_pp_freq1"]]$ph_pr_qu1), sum(pp_freqs[["mo
 table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
 
 table <- data.frame(`General Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
-                    `IPhOD quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `PP quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
                     `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
 table$`General Frequency` <- as.factor(table$`General Frequency`)
-table$`IPhOD quartile` <- as.factor(table$`IPhOD quartile`)
+table$`PP quartile` <- as.factor(table$`PP quartile`)
 ggplot(table, aes(`General Frequency`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `IPhOD quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `PP quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
   theme(axis.text=element_text(size=20),
@@ -878,12 +878,12 @@ table_chi_len1 <- c(sum(pp_mot_freqs[["chi_pp_freq1"]]$ph_pr_qu1), sum(pp_mot_fr
 table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
 
 table <- data.frame(`Maternal Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
-                    `Mot quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `PP quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
                     `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
 table$`Maternal Frequency` <- as.factor(table$`Maternal Frequency`)
-table$`Mot quartile` <- as.factor(table$`Mot quartile`)
+table$`PP quartile` <- as.factor(table$`PP quartile`)
 ggplot(table, aes(`Maternal Frequency`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `Mot quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `PP quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
   theme(axis.text=element_text(size=20),
@@ -910,12 +910,12 @@ table_chi_len1 <- c(sum(pp_mot_freqs[["mod_pp_freq1"]]$ph_pr_qu1), sum(pp_mot_fr
 table_chi_len1 <- table_chi_len1/sum(table_chi_len1)*100
 
 table <- data.frame(`Maternal Frequency` = c(rep(1,4),rep(2,4),rep(3,4),rep(4,4)),
-                    `Mot quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
+                    `PP quartile` = rep(c("Q1","Q2","Q3","Q4"),4),
                     `Novel words (%)`= c(table_chi_len1,table_chi_len2,table_chi_len3,table_chi_len4), check.names = F)
 table$`Maternal Frequency` <- as.factor(table$`Maternal Frequency`)
-table$`Mot quartile` <- as.factor(table$`Mot quartile`)
+table$`PP quartile` <- as.factor(table$`PP quartile`)
 ggplot(table, aes(`Maternal Frequency`, `Novel words (%)`)) + 
-  geom_bar(aes(fill = `Mot quartile`), stat = "identity", position = "dodge")+
+  geom_bar(aes(fill = `PP quartile`), stat = "identity", position = "dodge")+
   scale_y_continuous(limits=c(0, 100), breaks=seq(0, 100, by = 10))+
   scale_fill_grey()+
   theme(axis.text=element_text(size=20),
